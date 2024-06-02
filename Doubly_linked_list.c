@@ -116,34 +116,38 @@ struct Node* searchValue(struct Node* head, int target_value) {
     return NULL; // Value not found in the list
 }
 
+//sap xep tu nho -> lon
 void sortList(struct Node** head_ref) {
-    int swapped;
-    struct Node* ptr1;
-    struct Node* lptr = NULL; // Pointer to the last node
+    struct Node* current;
+    struct Node* index = NULL;
+    int temp;
 
     // Check if the list is empty
     if (*head_ref == NULL)
         return;
-		
-    do {
-        swapped = 0;
-        ptr1 = *head_ref;
 
-        while (ptr1->next != lptr) {
+    for (current = *head_ref; current != NULL; current = current->next) 
+	{
+        for (index = current->next; index != NULL; index = index->next) 
+		{
             // Compare adjacent node data
-            if (ptr1->data > ptr1->next->data) {
+            if (current->data > index->data) 
+			{
                 // Swap data of the nodes 
-                int temp = ptr1->data;
-                ptr1->data = ptr1->next->data;
-                ptr1->next->data = temp;
-                swapped = 1;
+                temp = current->data;
+                current->data = index->data;
+                index->data = temp;
+                
+                //a = 9, b = 12
+				//c 
+				//b1: c = a (a = 9, b = 12, c = 9)
+				//b2: a = b (a = 12, b = 12, c = 9)
+				//b3: b = c (a = 12, b = 9, c = 9)
             }
-            ptr1 = ptr1->next;
         }
-        lptr = ptr1; // Update the last node pointer
-    } 
-	while (swapped); // Repeat until no more swaps are needed
+    }
 }
+
 
 // Function to print nodes in forward direction
 void printList(struct Node* node) 
