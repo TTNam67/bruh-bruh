@@ -18,52 +18,45 @@ struct Student
     struct Student* next;  // Pointer to the next node
 }; 
 
-// Function to insert a student at the beginning of the list
-void insertAtBeginning(struct Student** head_ref, struct Student new_student) 
+struct Student* head = NULL;  // Your list's head pointer
+
+// Insert a Student at the end of the list
+void insertStudent() 
 {
-    struct Student* new_node = (struct Student*)malloc(sizeof(struct Student));
-
-    // Copy data to the new node (using memcpy for efficiency)
-    memcpy(new_node, &new_student, sizeof(struct Student)); 
-
-    new_node->next = *head_ref;
-    new_node->prev = NULL; 
-
-    if (*head_ref != NULL) 
-	{
-        (*head_ref)->prev = new_node;
-    }
-
-    *head_ref = new_node; 
-}
-
-// Function to insert a Student at the end of the list
-void insertAtEnd(struct Student** head_ref, struct Student new_student) 
-{
-
     // Allocate memory for the new node
     struct Student* new_node = (struct Student*)malloc(sizeof(struct Student));
+    
+    printf("\nEnter student's 'name: ");
+	scanf("%[^\n]", new_node->name);
+    
+    printf("Enter student ID: ");
+    scanf("%s", new_node->studentID);
 
-    // Copy data from the new_student object
-    strcpy(new_node->name, new_student.name);
-    strcpy(new_node->studentID, new_student.studentID);
-    new_node->gender = new_student.gender;
-    new_node->yearOfBirth = new_student.yearOfBirth;
-    new_node->gpa = new_student.gpa;
-    strcpy(new_node->major, new_student.major);
+    printf("Enter student's gender (1: male, 0: female): ");
+	scanf("%d", &new_node->gender);
+
+    printf("Enter student's year of birth: ");
+    scanf("%d", &new_node->yearOfBirth);
+
+    printf("Enter student's GPA: ");
+    scanf("%f", &new_node->gpa);
+	fflush(stdin);
+    
+    printf("Enter student's major: ");
+    scanf("%[^\n]", new_node->major);
 
     // Initialize pointers
     new_node->next = NULL;
 
     // If the list is empty, make the new node as head
-    if (*head_ref == NULL) {
+    if (head == NULL) {
         new_node->prev = NULL;
-        *head_ref = new_node;
+        head = new_node;
         return;
     }
 
     // Otherwise, traverse till the last node
-    struct Student* last = *head_ref;
+    struct Student* last = head;
     while (last->next != NULL)
         last = last->next;
 
@@ -75,75 +68,130 @@ void insertAtEnd(struct Student** head_ref, struct Student new_student)
 }
 
 // Function to delete a node from the doubly linked list
-void deleteStudent(struct Student** head_ref, struct Student* del) 
+void deleteStudent() 
 {
-    // Base case: Empty list or invalid node
-    if (*head_ref == NULL || del == NULL) 
-        return; 
+	// Base case: Empty list or invalid node
+    if (head == NULL) 
+    {
+    	printf("There's no student to be deleted");
+    	return; 
+	}
+	
+	struct Student* del = head;
 
-    // If the node to be deleted is the head node
-    if (*head_ref == del)
-        *head_ref = del->next;
+	fflush(stdin);
+	char id[50];
+	printf("Enter the studentID that you want to delete: ");
+    scanf("%s", id);
+	
+	while (del != NULL)
+	{
+		if (strcmp(id, del->studentID) == 0)
+		{
+			// Change "next" only if the node to be deleted is NOT the last node
+			if (del->next != NULL)
+			    del->next->prev = del->prev; 
+			
+			// Change "prev" only if the node to be deleted is NOT the first node
+			if (del->prev != NULL)
+			    del->prev->next = del->next;
+			
+			printf("Delete successfully");
 
-    // Change next only if the node to be deleted is NOT the last node
-    //Neu sau phan tu can xoa, con 1 phan tu nua 
-    if (del->next != NULL)
-        del->next->prev = del->prev; 
+			// If the node to be deleted is the head node
+			if (head == del)
+				head = del->next;
+			free(del);
+			return;
+		}
+		
+		del = del->next;
+	}
+	
+	printf("Couldn't find the student with the given studentID");
 
-    // Change prev only if the node to be deleted is NOT the first node
-    if (del->prev != NULL)
-        del->prev->next = del->next;
-
-    // Free the memory occupied by del
-    free(del);
+	// Free the memory occupied by del
+	free(del);
 }
 
 // Function to update a student by student ID
-void updateStudent(struct Student* head, char* studentID) 
+void updateStudent()
 {
     struct Student* temp = head;
-    while (temp != NULL) {
-        if (strcmp(temp->studentID, studentID) == 0) {
-            printf("Enter new name: ");
-            scanf("%s", temp->name);
-            printf("Enter new GPA: ");
-            scanf("%f", &temp->gpa);
 
-            // Optionally, update other fields...
+	fflush(stdin);
+	char id[50];
+	printf("Enter the studentID that you want to update: ");
+	scanf("%s", id);
+
+    while (temp != NULL)
+    {
+        if (strcmp(temp->studentID, id) == 0)
+        {
+        	printf("\nEnter new student's 'name: ");
+        	scanf("%[^\n]", temp->name);
+
+        	printf("Enter student's gender (1: male, 0: female): ");
+        	scanf("%d", &temp->gender);
+
+        	printf("Enter student's year of birth: ");
+        	scanf("%d", &temp->yearOfBirth);
+
+        	printf("Enter student's GPA: ");
+        	scanf("%f", &temp->gpa);
+        	fflush(stdin);
+
+        	printf("Enter student's major: ");
+        	scanf("%[^\n]", temp->major);
             return;
         }
         temp = temp->next;
     }
-    printf("Student with ID %s not found.\n", studentID);
+    printf("Student with ID %s not found.\n", id);
 }
 
 
 // Function to search for a student by ID
-struct Student* searchStudentForId(struct Student* head, char* targetID) {
-    struct Student* current = head;
+void searchStudentForId()
+{
+    struct Student* node = head;
+	fflush(stdin);
+	char id[50];
+	printf("Enter the studentID that you want to search for: ");
+	scanf("%s", id);
 
-    while (current != NULL) {
+    while (node != NULL)
+    {
         // Compare the current node's ID with the target ID
-        if (strcmp(current->studentID, targetID) == 0) {
-            return current; // Found, return the student node
+        if (strcmp(node->studentID, id) == 0)
+        {
+        	printf("\nThe student's information: ");
+        	printf("Name: %s\n", node->name);
+        	printf("ID: %s\n", node->studentID);
+        	printf("Gender: %s\n", node->gender ? "Male" : "Female");
+        	printf("Year of Birth: %d\n", node->yearOfBirth);
+        	printf("GPA: %.2f\n", node->gpa);
+        	printf("Major: %s\n\n", node->major);
+
         }
-        current = current->next; // Move to the next node
+        node = node->next; // Move to the next node
     }
 
-    return NULL; // Not found
+	printf("Student with ID %s not found.\n", id);
 }
 
 //sap xep tu nho -> lon
-void sortList(struct Student** head_ref) {
+void sortList()
+{
     struct Student* current;
     struct Student* index = NULL;
    	
 
     // Check if the list is empty
-    if (*head_ref == NULL)
+    if (head == NULL)
         return;
 
-    for (current = *head_ref; current != NULL; current = current->next) 
+    for (current = head; current != NULL; current = current->next)
 	{
         for (index = current->next; index != NULL; index = index->next) 
 		{
@@ -185,8 +233,11 @@ void sortList(struct Student** head_ref) {
 
 
 // Function to print student details in the list
-void printList(struct Student* node) 
+void printList() 
 {
+	struct Student* node = head;
+	
+	
     while (node != NULL) {
         printf("Name: %s\n", node->name);
         printf("ID: %s\n", node->studentID);
@@ -212,73 +263,59 @@ void freeList(struct Student** head_ref) {
     *head_ref = NULL; 
 }
 
+int getChoice() 
+{
+    int choice;
+    printf("\nStudent Management System\n");
+    printf("1. Add Student\n");
+    printf("2. Delete Student\n");
+    printf("3. Update Student\n");
+    printf("4. Search Student\n");
+    printf("5. Sort Students\n");
+    printf("6. Display Students\n");
+    printf("7. Exit\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
 
+	fflush(stdin);
+
+    return choice;
+}
 
 int main() 
 {
-	struct Student* head = NULL;  // Your list's head pointer
-	
-    struct Student newStudent;
-	strcpy(newStudent.name, "John Doe");
-	strcpy(newStudent.studentID, "ST001");
-	newStudent.gender = 1; // True for male
-	newStudent.yearOfBirth = 1998;
-	newStudent.gpa = 3.5;
-	strcpy(newStudent.major, "Computer Science");
-	
-	struct Student newStudent2;
-	strcpy(newStudent2.name, "Something");
-	strcpy(newStudent2.studentID, "ST002");
-	newStudent2.gender = 0; // True for male
-	newStudent2.yearOfBirth = 1999;
-	newStudent2.gpa = 4.0;
-	strcpy(newStudent2.major, "Software Engineering");
-	
-	
-	insertAtEnd(&head, newStudent);  
-	insertAtEnd(&head, newStudent2);  
-	
-	
-	struct Student newStudent3;
-	strcpy(newStudent3.name, "Something2");
-	strcpy(newStudent3.studentID, "ST003");
-	newStudent3.gender = 1; // True for male
-	newStudent3.yearOfBirth = 2003;
-	newStudent3.gpa = 3.9;
-	strcpy(newStudent3.major, "ABC");
-	
-	insertAtBeginning(&head, newStudent3);
-	//1 -> 2
-	sortList(&head);
-    printList(head);
-    
-    char targetID[50];
-	printf("Enter the student ID to search for: ");
-    scanf("%s", targetID);
+    int choice;
 
-    struct Student* foundStudent = searchStudentForId(head, targetID);
+    while (1) 
+	{
+        choice = getChoice();
 
-    if (foundStudent != NULL) {
-        printf("Student found:\n");
-        printf("Name: %s\n", foundStudent->name);
-        // ... (Print other details)
-    } else {
-        printf("Student not found.\n");
+        switch (choice) 
+		{
+            case 1:
+                insertStudent();
+                break;
+            case 2:
+            	deleteStudent();
+        		break;
+        	case 3:
+        		updateStudent();
+        		break;
+        	case 4:
+        		searchStudentForId();
+        		break;
+        	case 5:
+        		sortList();
+        		break;
+            case 6:
+            	printList();
+        		break;
+            case 7:
+                exit(0); // Exit the program
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
     }
-
-//    
-//    struct Student* nodeToDelete = head->next; // Delete the second node (value 7)
-//
-//    deleteStudent(&head, nodeToDelete);
-//    // Update the node with data 1 to 12
-//    updateStudent(&head, 1, 12); 
-//
-//    // Print the list (forward traversal)
-//    printf("\nCreated DLL is: ");
-//    printList(head);
-
-    // Free memory (not shown, but important to prevent leaks)
-	freeList(&head); 
-
     return 0;
 }
+
